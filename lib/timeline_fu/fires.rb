@@ -32,7 +32,7 @@ module TimelineFu
           end
           create_options[:event_type] = event_type.to_s
           if create_options[:user].kind_of?(Array)
-            create_options[:user].each { |user| TimelineEvent.create!(create_options.merge({:user => user }))}
+            create_options[:user].each { |user| TimelineEvent.create!(create_options.merge({:user => user })) unless user == create_options[:actor]}
           else
             TimelineEvent.create!(create_options)
           end
