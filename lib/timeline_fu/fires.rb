@@ -18,7 +18,7 @@ module TimelineFu
 
         method_name = :"fire_#{event_type}_after_#{opts[:on]}"
         define_method(method_name) do
-          create_options = [:account, :actor, :subject, :secondary_subject].inject({}) do |memo, sym|
+          create_options = [:user, :actor, :subject, :secondary_subject].inject({}) do |memo, sym|
             if opts[sym]
               if opts[sym].respond_to?(:call)
                 memo[sym] = opts[sym].call(self)
@@ -31,8 +31,11 @@ module TimelineFu
             memo
           end
           create_options[:event_type] = event_type.to_s
-
-          TimelineEvent.create!(create_options)
+          if create_options[:user].kind_of?(Array)
+            create_options[:user].each { |user| TimelineEvent.create!(create_options.merge({:user => user }))}
+          else
+            TimelineEvent.create!(create_options)
+          end
         end
 
         send(:"after_#{opts[:on]}", method_name, :if => opts[:if])
